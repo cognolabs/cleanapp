@@ -157,6 +157,7 @@ class MobileDetection {
   final String wardName;
   final List<int> bbox;
   final String mapsLink;
+  final String? imageUrl;
 
   MobileDetection({
     required this.detectionId,
@@ -172,6 +173,7 @@ class MobileDetection {
     required this.wardName,
     required this.bbox,
     required this.mapsLink,
+    this.imageUrl,
   });
 
   factory MobileDetection.fromJson(Map<String, dynamic> json) {
@@ -189,6 +191,7 @@ class MobileDetection {
       wardName: json['ward_name'],
       bbox: List<int>.from(json['bbox']),
       mapsLink: json['maps_link'],
+      imageUrl: json['image_url'],
     );
   }
 

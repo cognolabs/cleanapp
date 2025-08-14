@@ -6,7 +6,9 @@ import 'package:cognoapp/presentation/common_widgets/app_bar.dart';
 import 'package:cognoapp/presentation/common_widgets/app_button.dart';
 import 'package:cognoapp/presentation/common_widgets/app_card.dart';
 import 'package:cognoapp/config/theme.dart';
+import 'package:cognoapp/config/constants.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class CameraResultsScreen extends StatelessWidget {
   final ProcessingResult? result;
@@ -349,6 +351,13 @@ class CameraResultsScreen extends StatelessWidget {
                   ),
                 ],
               ),
+              
+              // Display processed image with bounding boxes if available
+              if (detection.imageUrl != null) ...[
+                const SizedBox(height: 12),
+                _buildDetectionImage(context, detection),
+              ],
+              
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -377,6 +386,98 @@ class CameraResultsScreen extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetectionImage(BuildContext context, MobileDetection detection) {
+    if (detection.imageUrl == null) return const SizedBox.shrink();
+    
+    final imageUrl = '${AppConstants.API_URL}${detection.imageUrl}';
+    
+    return Container(
+      width: double.infinity,
+      height: 200,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppTheme.primaryColor.withOpacity(0.2)),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Stack(
+          children: [
+            CachedNetworkImage(
+              imageUrl: imageUrl,
+              fit: BoxFit.contain,
+              width: double.infinity,
+              height: double.infinity,
+              placeholder: (context, url) => Container(
+                color: Colors.grey[200],
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+              errorWidget: (context, url, error) => Container(
+                color: Colors.grey[200],
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error, color: Colors.red),
+                    SizedBox(height: 8),
+                    Text('Failed to load image'),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'Detection Result',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 8,
+              left: 8,
+              child: GestureDetector(
+                onTap: () => _showFullScreenImage(context, imageUrl),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.zoom_in, size: 14, color: Colors.white),
+                      SizedBox(width: 4),
+                      Text(
+                        'Tap to enlarge',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -617,6 +718,66 @@ class CameraResultsScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showFullScreenImage(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(16),
+        child: Stack(
+          children: [
+            Center(
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                fit: BoxFit.contain,
+                placeholder: (context, url) => Container(
+                  width: 100,
+                  height: 100,
+                  color: Colors.black26,
+                  child: const Center(
+                    child: CircularProgressIndicator(color: Colors.white),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  width: 200,
+                  height: 200,
+                  color: Colors.black26,
+                  child: const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error, color: Colors.white),
+                      SizedBox(height: 8),
+                      Text('Failed to load image', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 16,
+              right: 16,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.close,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -647,80 +647,9 @@ class _CameraDetectionScreenState extends State<CameraDetectionScreen>
             ),
           ),
 
-          // Top info overlay
-          Positioned(
-            top: 16,
-            left: 16,
-            right: 16,
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Manager Detection Mode',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Capture images to detect issues using all 5 AI models:',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Wrap(
-                    spacing: 8,
-                    runSpacing: 4,
-                    children: [
-                      _ModelChip(label: 'Garbage'),
-                      _ModelChip(label: 'Pothole'),
-                      _ModelChip(label: 'Stray Animal'),
-                      _ModelChip(label: 'Hoarding'),
-                      _ModelChip(label: 'Encroachment'),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
         ],
       ),
     );
   }
 }
 
-class _ModelChip extends StatelessWidget {
-  final String label;
-
-  const _ModelChip({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppTheme.primaryColor.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.primaryColor.withOpacity(0.5)),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-}
